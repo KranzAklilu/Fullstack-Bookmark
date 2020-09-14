@@ -1,0 +1,55 @@
+.main {
+  margin-top: 100px;
+  @include flex(row, space-evenly, flex-start);
+  &__category {
+    @include flex(column, flex-start, flex-start);
+  }
+  &__categories-link {
+    display: inline-block;
+    margin: 20px 0;
+    padding: 10px 25px;
+    border-radius: 10px;
+    text-transform: capitalize;
+    font-size: 0.8rem;
+    color: #fff;
+    &--active {
+      background-color: $blue;
+    }
+  }
+  &__add-collection,
+  &__add-bookmark {
+    display: inline-block;
+    margin-top: 20px;
+    color: $blue;
+    background: transparent;
+    border: none;
+    padding: 10px 25px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+  &__content-btn {
+    margin-top: 40px;
+  }
+  &__content-item {
+    @include flex(row, space-evenly, center);
+
+    padding: 15px 45px;
+    margin: 20px 0;
+    background-color: $text-bg;
+    border-radius: 10px;
+  }
+  i {
+    cursor: pointer;
+    margin: 0 7px;
+  }
+  &__content-text,
+  &__content-link {
+    margin: 20px 0;
+    margin-right: 75px;
+    font-weight: 400;
+    font-size: 0.8rem;
+  }
+  &__content-link {
+    font-size: 0.7rem;
+  }
+}

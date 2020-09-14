@@ -1,0 +1,12 @@
+.header {
+  margin-top: 50px;
+  @include flex(row, space-evenly, center);
+  &__header {
+    text-transform: uppercase;
+    font-size: 1.5rem;
+  }
+  &__input {
+    background-color: $text-bg;
+    border: none;
+  }
+}
