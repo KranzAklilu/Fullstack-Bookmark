@@ -3,9 +3,15 @@ exports.up = function (knex) {
     table.increments();
     table.string("name").notNullable();
     table.string("link").notNullable();
-    table.integer("user_id").notNullable().references("id").inTable("user");
+    table
+      .integer("user_id")
+      .unique()
+      .notNullable()
+      .references("id")
+      .inTable("user");
     table
       .integer("category_id")
+      .unique()
       .notNullable()
       .references("id")
       .inTable("category");

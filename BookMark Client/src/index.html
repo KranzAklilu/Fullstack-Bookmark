@@ -1,66 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./scss/main.scss" />
-    <title>BookMark</title>
-  </head>
-  <body>
-    <div id="App">
-      <header class="header">
-        <h1 class="header__header">bookmark</h1>
-        <input
-          class="header__input"
-          type="text"
-          placeholder="Find Bookmark..."
-        />
-      </header>
-      <main class="main">
-        <aside class="main__category">
-          <a href="" class="main__categories-link main__categories-link--active"
-            >programming</a
-          >
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./scss/main.scss" />
+  <title>BookMark</title>
+</head>
+
+<body>
+  <div id="App">
+    <header class="header">
+      <h1 class="header__header">bookmark</h1>
+      <input class="header__input" type="text" placeholder="Find Bookmark..." />
+    </header>
+    <section class="form">
+      <div class="form__login form__login--active">
+        <form class="form__form login" action="http://localhost:5000/login" method="post">
+          <h2 class="form__header">login</h2>
+          <div class="form__input-container">
+            <label for="input-email">Email: </label>
+            <input type="email" name="email" id="input-email" class="form__input" required />
+          </div>
+          <div class="form__input-container">
+            <label for="input-password">Password: </label>
+            <input type="password" name="password" id="input-password" class="form__input" required />
+          </div>
+          <input type="submit" class="form__btn" value="login" />
+          <a href="/register" class="form__link">Dont have an account?</a>
+        </form>
+      </div>
+      <div class="form__register">
+        <form class="form__form register" action="http://localhost:5000/register" method="post">
+          <h2 class="form__header">register</h2>
+          <div class="form__input-container">
+            <label for="input-email">Email: </label>
+            <input type="email" name="email" id="input-email" class="form__input" required />
+          </div>
+          <div class="form__input-container">
+            <label for="input-password">Password: </label>
+            <input type="password" name="password" id="input-password" class="form__input" required />
+          </div>
+          <input type="submit" value="register" class="form__btn" />
+          <a href="/login" class="form__link">Already have an account?</a>
+        </form>
+      </div>
+    </section>
+    <main class="main main--active">
+      <aside class="main__category">
+        <div class="main__category-item">
+          <a href="" class="main__categories-link main__categories-link--active">programming</a>
           <a href="" class="main__categories-link">netflix</a>
           <a href="" class="main__categories-link">other</a>
-          <input
-            type="text"
-            name=""
-            class="main__add-collection"
-            placeholder="add new collections..."
-          />
-        </aside>
-        <section class="main__content">
+        </div>
+        <input type="text" class="main__add-collection" value="" placeholder="add new collections..." />
+      </aside>
+      <section class="main__content">
+        <div class="main__content-item-container">
           <div class="main__content-item">
-            <h3 class="main__content-text">Here Is where People Write Stuff</h3>
+            <h3 class="main__content-text">
+              Here Is where People Write Stuff
+            </h3>
             <div class="main__link-containers">
               <i class="fa fa-pencil-square-o"></i>
               <i class="fa fa-trash-o"></i>
             </div>
           </div>
           <div class="main__content-item">
-            <h3 class="main__content-text">Here Is where People Write Stuff</h3>
+            <h3 class="main__content-text">
+              Here Is where People Write Stuff
+            </h3>
             <div class="main__link-containers">
               <i class="fa fa-pencil-square-o"></i><i class="fa fa-trash-o"></i>
             </div>
           </div>
           <div class="main__content-item">
             <div class="main__content-text-container">
-              <p class="main__content-text">Here Is where People Write Stuff</p>
+              <p class="main__content-text">dWrite Stuff</p>
             </div>
             <div class="main__link-containers">
               <i class="fa fa-pencil-square-o"></i><i class="fa fa-trash-o"></i>
             </div>
           </div>
-          <input
-            type="text"
-            name=""
-            class="main__add-bookmark"
-            placeholder="add new bookmarks..."
-          />
-        </section>
-      </main>
-    </div>
-    <script src="./js/app.js"></script>
-  </body>
+        </div>
+        <input type="text" name="" class="main__add-bookmark" placeholder="add new bookmarks..." />
+      </section>
+    </main>
+  </div>
+  <script src="./js/app.js"></script>
+</body>
+
 </html>

@@ -1,25 +1,56 @@
+import { elements } from "./lib/elements";
+
 class Auth {
-  static url = "http://localhost:5000/login";
-  static dummyUser = {
-    email: "1@1",
-    password: "1",
-  };
+  static getLoggedIn() {
+    elements.login;
+  }
   static async login() {
-    const response = await fetch(this.url, {
+    const url = "http://localhost:3000/login";
+    const user = {
+      email: elements.emailInput.value,
+      password: elements.passwordInput.value,
+    };
+    const headers = new Headers()
+    headers.append("Accept", "application/json")
+    headers.append("Content-Type", "application/json")
+
+    const request = new Request(url, {
       method: "POST",
       mode: "cors",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(this.dummyUser),
-    });
+      headers,
+      body: JSON.stringify(user),
+    })
+
+    const response = await fetch(request);
     return response.json();
   }
   static setToken(token) {
-    return localStorage.setItem("Token", token);
+    localStorage.setItem("jwt", JSON.stringify(token));
   }
   static getToken() {
-    return localStorage.getItem("Token");
+    return localStorage.getItem("jwt");
+  }
+  static async setToHeader() {
+
+    const url = 'http://localhost:3000/'
+    const jwt = JSON.parse(this.getToken());
+
+    const headers = new Headers()
+    headers.append("Accept", "application/json")
+    headers.append("Authentication", `Bearer ${jwt}`)
+
+    const res = new Request(url, {
+      method: "GET",
+      mode: "cors",
+      headers,
+    })
+
+    const response = await fetch(res)
+    if (response.ok) {
+      elements.formLogin.classList.remove("form__login--active")
+      elements.form.style.display = "none"
+      elements.main.classList.remove("main--active")
+    }
   }
 }
 export default Auth;

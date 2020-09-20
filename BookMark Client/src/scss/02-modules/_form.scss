@@ -1,23 +1,46 @@
-.login-form {
-  background: $text-bg;
-  width: 50%;
+.form {
+  &__login {
+    display: none;
+    &--active {
+      display: block;
+      position: absolute;
+      min-height: 100vh;
+      padding: 70px 0;
+    }
+  }
+  &__register {
+    display: none;
+    &--active {
+      display: block;
+      position: absolute;
+      height: 100vh;
+      padding: 70px 0;
+    }
+  }
+  height: 100vh;
+  background: $accent;
+  border-radius: 20px;
+  width: 40%;
   min-width: 400px;
-  margin: 150px auto;
-  padding: 70px 0;
+  margin: 100px auto;
   @include flex(column, center, center);
   &__header {
     text-transform: uppercase;
     font-weight: 400;
+    margin: 50px 0;
     margin-bottom: 50px;
   }
   &__input-container {
     margin: 25px 0;
-    width: 85%;
+    width: 100%;
   }
   &__input {
     margin-top: 15px;
     width: 100%;
-    min-height: 50px;
+    min-height: 40px;
+    &::placeholder {
+      color: #fff;
+    }
   }
   &__btn {
     display: inline-block;
@@ -27,7 +50,7 @@
     margin: 0 auto;
     margin-top: 50px;
     padding: 15px 0;
-    width: 60%;
+    width: 100%;
     border-radius: 10px;
     border: none;
   }

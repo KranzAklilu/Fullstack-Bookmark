@@ -1,19 +1,37 @@
 import "babel-polyfill";
 import Auth from "./Auth";
 import Controller from "./lib/controller";
-import elements from "./lib/elements";
+import { elements } from "./lib/elements";
 
-// const app = new Auth();
-
-// const token = Auth.login().then((data) => data);
-
-elements.addCategory.addEventListener("keydown", (e) => {
-  console.log(e);
-
-  const value = e.target.value;
-  console.log(1234);
-  if (e.keyCode == 13) {
-    value = "";
+document.addEventListener("DOMContentLoaded", () => {
+  if (Auth.getToken) {
+    Auth.setToHeader()
   }
-  // Controller.insertCollection(value);
+})
+
+elements.addCategory.addEventListener("keyup", (e) => {
+  let value = e.target.value;
+  if (e.key === "Enter") {
+    Controller.insertCollection(value, "category");
+    e.target.value = "";
+  }
+});
+elements.addBookmark.addEventListener("keyup", (e) => {
+  let value = e.target.value;
+  if (e.key === "Enter") {
+    Controller.insertCollection(value, "bookmark");
+    e.target.value = "";
+  }
+});
+elements.submit.addEventListener("click", (e) => {
+  e.preventDefault();
+  Auth.login().then(res => {
+    const { _id, token, expiresIn } = res;
+
+    return { _id, token, expiresIn }
+  }).then(data => {
+    if (!data.token) throw new Error("Bad Request")
+    Auth.setToken(data.token)
+    Auth.setToHeader()
+  }).catch(err => console.log(err.message))
 });

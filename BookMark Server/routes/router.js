@@ -51,15 +51,15 @@ router.post(
       req.user.salt
     );
     if (isValid) {
-      console.log(req.user);
       const tokenObject = utils.issueJWT(req.user);
       res.status(200).json({
         success: true,
+        _id: req.user.id,
         token: tokenObject.token,
         expiresIn: tokenObject.expires,
       });
     } else {
-      console.log("WTF");
+      req.sendStatus(403).json({ msg: "Incorrect Email or Password" });
     }
   }
 );
@@ -78,13 +78,6 @@ router.post("/register", async (req, res) => {
       .then((user) => {
         res.json(user);
       })
-      // .then(function () {
-      //   knex
-      //     .select()
-      //     .from("user")
-      //     .then((user) => res.json(user))
-      //     .catch((err) => console.log(err));
-      // })
       .catch((err) => console.log(err));
   } catch (err) {
     console.log(err);

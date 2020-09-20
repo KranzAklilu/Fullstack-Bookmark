@@ -1,7 +1,12 @@
+.main--active{
+  & * {
+    display: none;
+  }
+}
 .main {
-  margin-top: 100px;
+  margin: 100px 0;
   @include flex(row, space-evenly, flex-start);
-  &__category {
+  &__category-item {
     @include flex(column, flex-start, flex-start);
   }
   &__categories-link {
@@ -19,10 +24,11 @@
   &__add-collection,
   &__add-bookmark {
     display: inline-block;
-    margin-top: 20px;
+    margin-top: 50px;
     color: $blue;
     background: transparent;
-    border: none;
+    border: 1px solid $blue;
+    border-radius: 10px;
     padding: 10px 25px;
     text-transform: uppercase;
     font-size: 0.8rem;
@@ -31,11 +37,10 @@
     margin-top: 40px;
   }
   &__content-item {
-    @include flex(row, space-evenly, center);
-
+    @include flex(row, space-between, center);
     padding: 15px 45px;
     margin: 20px 0;
-    background-color: $text-bg;
+    background-color: $accent;
     border-radius: 10px;
   }
   i {

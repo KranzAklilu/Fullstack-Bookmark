@@ -32,7 +32,19 @@ module.exports = {
       return knex("bookmark").where("id", id);
     },
     getAll: function () {
-      return knex("bookmarks").returning("*");
+      return knex("bookmark").returning("*");
+    },
+    innerJoinUser: function (user_id) {
+      return knex("bookmark")
+        .select("user.id")
+        .innerJoin("user", "bookmark.user_id", Number(user_id))
+        .where("user.id", user_id);
+    },
+    innerJoinCategory: function (category_id) {
+      return knex("bookmark")
+        .select("category.name")
+        .innerJoin("category", "bookmark.category_id", Number(category_id))
+        .where("category.id", category_id);
     },
     update: function (id, updated) {
       return knex("bookmark").where("id", id).update({
