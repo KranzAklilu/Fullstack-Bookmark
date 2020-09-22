@@ -69,11 +69,14 @@ elements.submitRegister.addEventListener("click", (e) => {
   };
   registerUser().then((res) => {
     if (res) {
-      console.log("asd");
-      generateToken(user).then((res) => console.log(res));
-      console.log(user);
+      generateToken(user).then(({ _id, token, expiresIn }) => {
+        _id = _id;
+        setToken(token);
+        setToHeader();
+        displayName();
+      });
+      console.log(res);
     }
-    console.log(res);
   });
 });
 async function registerUser() {
@@ -169,11 +172,40 @@ function insertCollection(value, where = "category") {
   else if (where === "bookmark")
     elements.contentItemContainer.innerHTML += generateHtml(value, where);
 }
-elements.loginLink.addEventListener("click", (e) => {
+elements.loginLink.addEventListener("click", () => {
   elements.formLogin.style.display = "none";
   elements.formRegister.style.display = "block";
 });
-elements.registerLink.addEventListener("click", (e) => {
+elements.registerLink.addEventListener("click", () => {
   elements.formRegister.style.display = "none";
   elements.formLogin.style.display = "block";
+});
+elements.categoryContainerItem.addEventListener("click", (e) => {
+  e.preventDefault();
+  const activeClass = "main__categories-link--active";
+
+  const children = elements.categoryContainerItem.children;
+  const arr = [...children];
+  const active = arr.find((child) => child.classList.contains(activeClass));
+  const child = arr.find((child) => e.target == child);
+
+  console.log(child);
+  if (e.target !== active && child) {
+    active.classList.remove(activeClass);
+    e.target.classList.add(activeClass);
+  }
+});
+elements.contentContainer.addEventListener("click", (e) => {});
+
+elements.edit.forEach((icon) => {
+  icon.addEventListener("click", (e) => {
+    console.log(1);
+    const containerDiv = e.target.parentElement.parentElement;
+    const content = e.target.parentElement.previousElementSibling.innerHTML;
+    console.log(content);
+
+    elements.addBookmark.value = content;
+    elements.addBookmark.focus();
+    elements.contentItemContainer.removeChild(containerDiv);
+  });
 });

@@ -8,8 +8,8 @@ const queryId = function (elem) {
   return document.querySelector(`#${elem}`);
 };
 const elements = {
-  edit: query("edit"),
-  trash: query("trash"),
+  edit: queryAll("fa-pencil-square-o"),
+  trash: queryAll("fa-trash-o"),
   category: query("main__category"),
   categoryItem: query("main__category-item"),
   addCategory: query("main__add-collection"),
@@ -17,7 +17,7 @@ const elements = {
   addBookmark: query("main__add-bookmark"),
   contentContainer: query("main__content"),
   contentItemContainer: query("main__content-item-container"),
-  categoryContainer: query("main__category"),
+  categoryContainerItem: query("main__category-item"),
   categoryBtn: query("main_btn"),
   categoryLink: queryAll("main__categories-link"),
   loginEmail: queryId("login-email"),
