@@ -4,12 +4,8 @@ const passport = require("passport");
 const cors = require("cors");
 const queries = require("../db/queries");
 const utils = require("../lib/utils");
+const jwt = require("jsonwebtoken");
 const initialize = require("../config/passport-config");
-const {
-  checkIfAuthenticated,
-  checkIfNotAuthenticated,
-} = require("../middleware/checkAuthentication");
-const { json } = require("express");
 const knex = require("../db/knex");
 
 const getUserByEmail = (email) => queries.user.getByEmail(email);
@@ -37,12 +33,18 @@ router.get(
     });
   }
 );
+
+router.get(
+  "/getUser",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    res.json(req.user);
+  }
+);
 router.post(
   "/login",
   passport.authenticate("local", {
     session: false,
-    // successRedirect: "/login",
-    // failureRedirect: "/register",
   }),
   (req, res) => {
     const isValid = utils.validPassword(
@@ -59,7 +61,7 @@ router.post(
         expiresIn: tokenObject.expires,
       });
     } else {
-      req.sendStatus(403).json({ msg: "Incorrect Email or Password" });
+      req.sendStatus(402).json({ msg: "Incorrect Email or Password" });
     }
   }
 );
@@ -76,7 +78,7 @@ router.post("/register", async (req, res) => {
         hash,
       })
       .then((user) => {
-        res.json(user);
+        res.json({ msg: "Successfully Registered", user });
       })
       .catch((err) => console.log(err));
   } catch (err) {

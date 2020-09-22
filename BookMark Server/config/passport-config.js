@@ -14,9 +14,9 @@ const initialize = function (passport, getUserByEmail, getUserById) {
     usernameField: "email",
   };
   const jwtOptions = {
+    algorithms: ["RS256"],
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: PUB_KEY,
-    algorithms: ["RS256"],
   };
   const authenticateUser = async function (email, password, done) {
     const user = await getUserByEmail(email).then((user) => user[0]);
@@ -35,7 +35,6 @@ const initialize = function (passport, getUserByEmail, getUserById) {
     }
   };
   const jwtConfig = async function (payload, done) {
-    console.log(payload);
     await getUserById(payload.sub)
       .then((user) => {
         console.log(user);
@@ -47,17 +46,11 @@ const initialize = function (passport, getUserByEmail, getUserById) {
         }
       })
       .catch((err) => done(err));
-
-    console.log(user);
   };
 
   passport.use(new LocalStrategy(localOptions, authenticateUser));
   passport.use("jwt", new JwtStrategy(jwtOptions, jwtConfig));
 
-  // passport.serializeUser((user, done) => done(null, user.id));
-  // passport.deserializeUser(async (id, done) =>
-  //   done(null, await getUserById(id).then((id) => id))
-  // );
 };
 
 module.exports = initialize;

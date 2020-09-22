@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const jsonwebtoken = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
 
@@ -27,20 +27,20 @@ function genPassword(password) {
 function issueJWT(user) {
   const _id = user.id;
 
-  const expiresIn = "1d";
+  const expiresIn = "5d";
 
   const payload = {
     sub: _id,
-    iat: Date.now(),
   };
-
-  const signedToken = jsonwebtoken.sign(payload, PRIV_KEY, {
-    expiresIn: expiresIn,
+  const options = {
     algorithm: "RS256",
-  });
+    expiresIn,
+  }
+
+  const signedToken = jwt.sign(payload, PRIV_KEY, options);
 
   return {
-    token: "Bearer " + signedToken,
+    token: `Bearer ${signedToken}`,
     expires: expiresIn,
   };
 }
