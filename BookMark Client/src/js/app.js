@@ -2,13 +2,19 @@
 import "babel-polyfill";
 import { elements } from "./lib/elements";
 
-const baseUrl = "http://localhost:3000/";
+const authRoute = "http://localhost:3000/auth/";
+const userRoute = "http://localhost:3000/user/";
+
+const state = {};
+const categories = [];
+state.category = categories;
+
 const getUser = async function () {
   const jwt = JSON.parse(getToken());
   const headers = new Headers();
   headers.append("Content-Type", "application/json");
   headers.append("Authorization", jwt);
-  const request = new Request(baseUrl + "getUser", {
+  const request = new Request(userRoute + "getUser", {
     method: "GET",
     headers,
   });
@@ -16,7 +22,7 @@ const getUser = async function () {
   return response.json();
 };
 const displayName = function () {
-  const header = document.querySelector(".header__header");
+  const header = document.querySelector(".header__name");
   getUser().then((res) => {
     header.innerHTML = res.email;
   });
@@ -26,25 +32,39 @@ document.addEventListener("DOMContentLoaded", () => {
   if (getToken()) {
     setToHeader();
     displayName();
+  }
+});
+async function login(user) {
+  const headers = new Headers();
+  headers.append("Content-Type", "application/json");
+
+  const request = new Request(authRoute + "login", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(user),
+  });
+
+  const response = await fetch(request);
+  if (response.ok) {
+    const data = response.json();
+    data.then(({ _id, token, expiresIn }) => {
+      setToken(token);
+      setToHeader();
+      displayName();
+    });
+    return data;
   } else {
+    const popup = document.createElement("p");
+    popup.classList.add("form__popup");
+    popup.innerHTML = "Email or Password Incorrect";
+    elements.login.insertBefore(popup, elements.formHeaderLogin);
   }
-});
-
-elements.addCategory.addEventListener("keyup", (e) => {
-  let value = e.target.value;
-  if (e.key === "Enter") {
-    insertCollection(value, "category");
-    e.target.value = "";
-  }
-});
-
-elements.addBookmark.addEventListener("keyup", (e) => {
-  let value = e.target.value;
-  if (e.key === "Enter") {
-    insertCollection(value, "bookmark");
-    e.target.value = "";
-  }
-});
+}
+async function changeUserState(currentUser) {
+  const user = await login(currentUser);
+  state.user = user;
+  console.log(state.user._id);
+}
 elements.submitLogin.addEventListener("click", (e) => {
   e.preventDefault();
   if (getToken()) {
@@ -54,12 +74,12 @@ elements.submitLogin.addEventListener("click", (e) => {
     email: elements.loginEmail.value,
     password: elements.loginPassword.value,
   };
-  generateToken(user).then(({ _id, token, expiresIn }) => {
-    _id = _id;
-    setToken(token);
-    setToHeader();
-    displayName();
-  });
+  changeUserState(user);
+  // login(user).then(({ _id, token, expiresIn }) => {
+  //   _id = _id;
+  //   setToHeader();
+  //   displayName();
+  // });
 });
 elements.submitRegister.addEventListener("click", (e) => {
   e.preventDefault();
@@ -67,17 +87,18 @@ elements.submitRegister.addEventListener("click", (e) => {
     email: elements.registerEmail.value,
     password: elements.registerPassword.value,
   };
-  registerUser().then((res) => {
-    if (res) {
-      generateToken(user).then(({ _id, token, expiresIn }) => {
-        _id = _id;
-        setToken(token);
-        setToHeader();
-        displayName();
-      });
-      console.log(res);
-    }
-  });
+  registerUser()
+    .then((res) => {
+      login(user)
+        .then(({ _id, token, expiresIn }) => {
+          _id = _id;
+          setToken(token);
+          setToHeader();
+          displayName();
+        })
+        .catch((err) => console.log(err));
+    })
+    .catch((err) => console.log(err));
 });
 async function registerUser() {
   const user = {
@@ -87,45 +108,57 @@ async function registerUser() {
   const headers = new Headers();
   headers.append("Content-Type", "application/json");
 
-  const request = new Request(baseUrl + "register", {
+  const request = new Request(authRoute + "register", {
     method: "POST",
     headers,
     body: JSON.stringify(user),
   });
   const response = await fetch(request);
-  return response.json();
-}
-async function generateToken(user) {
-  const headers = new Headers();
-  headers.append("Content-Type", "application/json");
-
-  const request = new Request(baseUrl + "login", {
-    method: "POST",
-    headers,
-    body: JSON.stringify(user),
-  });
-
-  const response = await fetch(request);
+  console.log(response);
   if (response.ok) {
-    const data = await response.json();
-    return data;
+    return response.json();
   } else {
+    const { msg, err } = await response.json();
+
     const popup = document.createElement("p");
     popup.classList.add("form__popup");
-    popup.innerHTML = "Email or Password Incorrect";
-    elements.form.insertBefore(popup, elements.formHeader);
+    popup.innerHTML = msg;
+    elements.register.insertBefore(popup, elements.formHeaderRegister);
+
+    console.log(err);
   }
 }
-function setToken(token) {
-  localStorage.setItem("jwt", JSON.stringify(token));
-}
-function getToken() {
-  return localStorage.getItem("jwt");
-}
-function removeToken() {
-  return localStorage.removeItem("jwt");
-}
 
+elements.addCategory.addEventListener("keyup", (e) => {
+  e.preventDefault();
+  let value = e.target.value;
+  if (e.key === "Enter") {
+    insertCollection(value, "category");
+    e.target.value = "";
+  }
+});
+elements.bookmarkSubmit.addEventListener("click", (e) => {
+  e.preventDefault();
+  const value = {
+    name: elements.bookmarkName.value,
+    link: elements.bookmarkLink.value,
+  };
+  if (!value.name) {
+    elements.bookmarkName.focus();
+    elements.bookmarkName.classList.add("main__bookmark-name--focus");
+    elements.bookmarkLink.classList.remove("main__bookmark-link--focus");
+  } else if (!value.link) {
+    elements.bookmarkLink.focus();
+    elements.bookmarkLink.classList.add("main__bookmark-link--focus");
+    elements.bookmarkName.classList.remove("main__bookmark-name--focus");
+  } else {
+    elements.bookmarkName.classList.remove("main__bookmark-name--focus");
+    elements.bookmarkLink.classList.remove("main__bookmark-link--focus");
+    insertCollection(value, "bookmark");
+    elements.bookmarkName.value = "";
+    elements.bookmarkLink.value = "";
+  }
+});
 async function setToHeader() {
   const jwt = JSON.parse(getToken());
 
@@ -133,7 +166,7 @@ async function setToHeader() {
   headers.append("Content-Type", "application/json");
   headers.append("Authorization", jwt);
 
-  const request = new Request(baseUrl + "protected", {
+  const request = new Request(authRoute + "protected", {
     method: "GET",
     headers,
   });
@@ -150,7 +183,7 @@ async function setToHeader() {
     console.error(err);
   }
 }
-function generateHtml(value, where = "category") {
+function generateHtml(value, where) {
   if (where === "category") {
     return `
        <a href="" class="main__categories-link active">${value}</a>
@@ -158,7 +191,12 @@ function generateHtml(value, where = "category") {
   } else if (where === "bookmark") {
     return `
          <div class="main__content-item">
-           <h3 class="main__content-text">${value}</h3>
+           <div class="main__content-text-container">
+            <h3 class="main__content-name">
+              ${value.name}
+            </h3>
+            <p class="main__content-link">${value.link}</p>
+           </div>
            <div class="main__link-containers">
             <i class="fa fa-pencil-square-o"></i>
             <i class="fa fa-trash-o"></i>
@@ -166,11 +204,48 @@ function generateHtml(value, where = "category") {
          </div>`;
   }
 }
-function insertCollection(value, where = "category") {
-  if (where === "category")
+async function insertCollection(value, where) {
+  if (where === "category") {
+    const category = {
+      name: value,
+    };
     elements.categoryItem.innerHTML += generateHtml(value, where);
-  else if (where === "bookmark")
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    const request = new Request(userRoute + "create-category", {
+      method: "POST",
+      headers,
+      body: JSON.stringify(category),
+    });
+
+    const response = await fetch(request);
+    const data = await response.json();
+    categories.push(data);
+    console.log(state.category);
+    return data;
+  } else if (where === "bookmark") {
     elements.contentItemContainer.innerHTML += generateHtml(value, where);
+
+    const bookmark = {
+      name: value.name,
+      link: value.link,
+      user_id: state.user._id,
+      // category_id: state.category._id,
+    };
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+
+    const request = new Request(userRoute + "create-bookmark", {
+      method: "POST",
+      headers,
+      // body: JSON.stringify(bookmark),
+    });
+
+    console.log(value);
+    const response = await fetch(request);
+    // return response.json();
+  }
 }
 elements.loginLink.addEventListener("click", () => {
   elements.formLogin.style.display = "none";
@@ -180,6 +255,7 @@ elements.registerLink.addEventListener("click", () => {
   elements.formRegister.style.display = "none";
   elements.formLogin.style.display = "block";
 });
+
 elements.categoryContainerItem.addEventListener("click", (e) => {
   e.preventDefault();
   const activeClass = "main__categories-link--active";
@@ -188,14 +264,12 @@ elements.categoryContainerItem.addEventListener("click", (e) => {
   const arr = [...children];
   const active = arr.find((child) => child.classList.contains(activeClass));
   const child = arr.find((child) => e.target == child);
-
-  console.log(child);
+  state.category.name = child.innerHTML;
   if (e.target !== active && child) {
     active.classList.remove(activeClass);
     e.target.classList.add(activeClass);
   }
 });
-elements.contentContainer.addEventListener("click", (e) => {});
 
 elements.edit.forEach((icon) => {
   icon.addEventListener("click", (e) => {
@@ -209,3 +283,13 @@ elements.edit.forEach((icon) => {
     elements.contentItemContainer.removeChild(containerDiv);
   });
 });
+
+function setToken(token) {
+  localStorage.setItem("jwt", JSON.stringify(token));
+}
+function getToken() {
+  return localStorage.getItem("jwt");
+}
+function removeToken() {
+  return localStorage.removeItem("jwt");
+}

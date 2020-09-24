@@ -1,4 +1,4 @@
-.main--active{
+.main--active {
   & * {
     display: none;
   }
@@ -22,7 +22,9 @@
     }
   }
   &__add-collection,
-  &__add-bookmark {
+  &__bookmark-name,
+  &__bookmark-link,
+  &__bookmark-submit {
     display: inline-block;
     margin-top: 50px;
     color: $blue;
@@ -30,8 +32,20 @@
     border: 1px solid $blue;
     border-radius: 10px;
     padding: 10px 25px;
-    text-transform: uppercase;
     font-size: 0.8rem;
+    &--focus {
+      border: 1px solid rgb(206, 49, 49);
+    }
+    &::placeholder {
+      text-transform: uppercase;
+    }
+  }
+  &__bookmark-submit {
+    font-size: 0.9rem;
+    background-color: $blue;
+    width: 100%;
+    color: $accent;
+    text-transform: uppercase;
   }
   &__content-btn {
     margin-top: 40px;
@@ -47,14 +61,16 @@
     cursor: pointer;
     margin: 0 7px;
   }
-  &__content-text,
+  &__content-name,
   &__content-link {
     margin: 20px 0;
     margin-right: 75px;
     font-weight: 400;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
   &__content-link {
+    cursor: pointer;
+    color: $blue;
     font-size: 0.7rem;
   }
 }

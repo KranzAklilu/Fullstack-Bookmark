@@ -58,7 +58,7 @@ module.exports = {
   },
   category: {
     create: function (category) {
-      return knex("category").insert(category);
+      return knex("category").insert(category).returning("*");
     },
     getOne: function (id) {
       return knex("category").where("id", id);

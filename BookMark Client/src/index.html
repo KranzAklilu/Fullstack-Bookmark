@@ -10,7 +10,7 @@
   <body>
     <div id="App">
       <header class="header">
-        <h1 class="header__header">bookmark</h1>
+        <h1 class="header__name">bookmark</h1>
         <input
           class="header__input"
           type="text"
@@ -20,11 +20,11 @@
       <section class="form">
         <div class="form__login form__login--active">
           <form
-            class="form__form login"
+            class="form__container form__container-login"
             action="http://localhost:3000/login"
             method="post"
           >
-            <h2 class="form__header">login</h2>
+            <h2 class="form__header form__header-login">login</h2>
             <div class="form__input-container">
               <label for="login-email">Email: </label>
               <input
@@ -51,11 +51,11 @@
         </div>
         <div class="form__register">
           <form
-            class="form__form register"
+            class="form__container form__container-register"
             action="http://localhost:3000/register"
             method="post"
           >
-            <h2 class="form__header">register</h2>
+            <h2 class="form__header form__header-register">register</h2>
             <div class="form__input-container">
               <label for="register-email">Email: </label>
               <input
@@ -108,36 +108,61 @@
         <section class="main__content">
           <div class="main__content-item-container">
             <div class="main__content-item">
-              <h3 class="main__content-text">
-                Here Is where People Write Stuff
-              </h3>
+              <div class="main__content-text-container">
+                <h3 class="main__content-name">
+                  Here Is where People Write Stuff
+                </h3>
+                <p class="main__content-link">kjasasdajs</p>
+              </div>
               <div class="main__link-containers">
                 <i class="fa fa-pencil-square-o"></i>
                 <i class="fa fa-trash-o"></i>
               </div>
             </div>
             <div class="main__content-item">
-              <h3 class="main__content-text">
-                Here Is where People Write Stuff
-              </h3>
+              <div class="main__content-text-container">
+                <h3 class="main__content-name">
+                  Here Is where People Write Stuff
+                </h3>
+                <p class="main__content-link">kjasasdajs</p>
+              </div>
               <div class="main__link-containers">
                 <i class="fa fa-pencil-square-o"></i
                 ><i class="fa fa-trash-o"></i>
               </div>
             </div>
             <div class="main__content-item">
-              <h3 class="main__content-text">dWrite Stuff</h3>
+              <div class="main__content-text-container">
+                <h3 class="main__content-name">
+                  Here Is where People Write Stuff
+                </h3>
+                <p class="main__content-link">kjasasdajs</p>
+              </div>
               <div class="main__link-containers">
                 <i class="fa fa-pencil-square-o"></i
                 ><i class="fa fa-trash-o"></i>
               </div>
             </div>
           </div>
+          <div class="input__container">
+            <input
+              type="text"
+              name=""
+              class="main__bookmark-name"
+              placeholder="bookmark name"
+            />
+            <input
+              type="text"
+              name=""
+              class="main__bookmark-link"
+              placeholder="bookmark link"
+            />
+          </div>
           <input
-            type="text"
+            type="submit"
             name=""
-            class="main__add-bookmark"
-            placeholder="add new bookmarks..."
+            class="main__bookmark-submit"
+            value="add bookmark"
           />
         </section>
       </main>
