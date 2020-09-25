@@ -35,7 +35,7 @@ function issueJWT(user) {
   const options = {
     algorithm: "RS256",
     expiresIn,
-  }
+  };
 
   const signedToken = jwt.sign(payload, PRIV_KEY, options);
 

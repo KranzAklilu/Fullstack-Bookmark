@@ -26,7 +26,7 @@ module.exports = {
   },
   bookmark: {
     create: function (bookmark) {
-      return knex("bookmark").insert(bookmark);
+      return knex("bookmark").insert(bookmark).returning("*");
     },
     getById: function (id) {
       return knex("bookmark").where("id", id);
@@ -65,6 +65,9 @@ module.exports = {
     },
     getAll: function () {
       return knex("category").returning("*");
+    },
+    getOneByUserId: function (id) {
+      return knex("category").where("user_id", id).returning("*");
     },
     update: function (id, updated) {
       return knex("category").where("id", id).update({

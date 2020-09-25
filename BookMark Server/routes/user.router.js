@@ -23,26 +23,32 @@ router.get("/", (req, res) => {
 });
 router.post("/create-bookmark", (req, res) => {
   const bookmark = {
-    name: req.body.name,
+    value: req.body.name,
     link: req.body.link,
     user_id: req.body.user_id,
     category_id: req.body.category_id,
   };
   queries.bookmark
     .create(bookmark)
-    .then(function () {
-      queries.category
-        .getAll()
-        .then((bookmark) => res.json(bookmark))
-        .catch((err) => console.log(err));
-    })
+    .then((bookmark) => res.json(bookmark))
+    .catch((err) => console.log(err));
+});
+router.post("/load-categories", (req, res) => {
+  const categoryUserId = req.body.user_id;
+  queries.category
+    .getOneByUserId(categoryUserId)
+    .then((category) => res.json(category))
     .catch((err) => console.log(err));
 });
 router.post("/create-category", (req, res) => {
   const category = {
-    name: req.body.name,
+    value: req.body.name,
+    user_id: req.body.user_id,
   };
-  queries.category.create(category).then((category) => res.json(category));
+  queries.category
+    .create(category)
+    .then((category) => res.json(category))
+    .catch((err) => console.log(err));
 });
 router.get("/innerjoin/:id", (req, res) => {
   queries.bookmark

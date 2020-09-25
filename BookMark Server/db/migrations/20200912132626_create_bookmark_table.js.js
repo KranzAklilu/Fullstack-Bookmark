@@ -1,7 +1,7 @@
 exports.up = function (knex) {
   return knex.schema.createTable("bookmark", function (table) {
     table.increments();
-    table.string("name").notNullable();
+    table.string("value").notNullable();
     table.string("link").notNullable();
     table
       .integer("user_id")

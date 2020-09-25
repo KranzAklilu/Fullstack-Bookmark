@@ -5,9 +5,7 @@ import { elements } from "./lib/elements";
 const authRoute = "http://localhost:3000/auth/";
 const userRoute = "http://localhost:3000/user/";
 
-const state = {};
-const categories = [];
-state.category = categories;
+const state = new Object();
 
 const getUser = async function () {
   const jwt = JSON.parse(getToken());
@@ -19,19 +17,15 @@ const getUser = async function () {
     headers,
   });
   const response = await fetch(request);
+  if (getToken() && response.status == 401) {
+    removeToken();
+  }
   return response.json();
 };
-const displayName = function () {
-  const header = document.querySelector(".header__name");
-  getUser().then((res) => {
-    header.innerHTML = res.email;
-  });
-};
-
 document.addEventListener("DOMContentLoaded", () => {
   if (getToken()) {
     setToHeader();
-    displayName();
+    changeUserState(undefined, "onLoad");
   }
 });
 async function login(user) {
@@ -47,11 +41,13 @@ async function login(user) {
   const response = await fetch(request);
   if (response.ok) {
     const data = response.json();
-    data.then(({ _id, token, expiresIn }) => {
-      setToken(token);
-      setToHeader();
-      displayName();
-    });
+
+    const { _id, token, expiresIn } = await data;
+
+    if (!_id && getToken()) removeToken();
+    setToken(token);
+    setToHeader();
+    elements.name.innerHTML = state.user.email;
     return data;
   } else {
     const popup = document.createElement("p");
@@ -60,26 +56,64 @@ async function login(user) {
     elements.login.insertBefore(popup, elements.formHeaderLogin);
   }
 }
-async function changeUserState(currentUser) {
-  const user = await login(currentUser);
-  state.user = user;
-  console.log(state.user._id);
+
+async function loadCategories(id) {
+  const cateory = {
+    user_id: id,
+  };
+  const headers = new Headers();
+  headers.append("Content-Type", "application/json");
+  const request = new Request(userRoute + "load-categories", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(cateory),
+  });
+
+  const response = await fetch(request);
+  const data = response.json();
+
+  return data;
+}
+
+async function changeUserState(currentUser, where) {
+  if (where === "login") {
+    const { _id, email } = await login(currentUser);
+    state.user = { _id, email };
+  } else if (where === "register") {
+    const { _id, email } = await registerUser(currentUser);
+    state.user = { _id, email };
+  } else if (where === "onLoad") {
+    const { id, email } = await getUser();
+    state.user = { _id: id, email };
+    const categories = await loadCategories(id);
+    console.log(categories);
+    categories.forEach(({ value }) => insertCollection(value, "category"));
+    elements.name.innerHTML = email;
+  }
 }
 elements.submitLogin.addEventListener("click", (e) => {
   e.preventDefault();
-  if (getToken()) {
-    return;
-  }
+
   const user = {
     email: elements.loginEmail.value,
     password: elements.loginPassword.value,
   };
-  changeUserState(user);
-  // login(user).then(({ _id, token, expiresIn }) => {
-  //   _id = _id;
-  //   setToHeader();
-  //   displayName();
-  // });
+  const u = getUser();
+  if (getToken()) {
+    // return;
+  } else if (!user.email) {
+    elements.loginEmail.focus();
+    elements.loginEmail.classList.add("form__input--focus");
+    elements.loginPassword.classList.remove("form__input--focus");
+  } else if (!user.password) {
+    elements.loginPassword.focus();
+    elements.loginPassword.classList.add("form__input--focus");
+    elements.loginEmail.classList.remove("form__input--focus");
+  } else {
+    elements.loginPassword.classList.remove("form__input--focus");
+    elements.loginEmail.classList.remove("form__input--focus");
+    changeUserState(user, "login");
+  }
 });
 elements.submitRegister.addEventListener("click", (e) => {
   e.preventDefault();
@@ -87,24 +121,9 @@ elements.submitRegister.addEventListener("click", (e) => {
     email: elements.registerEmail.value,
     password: elements.registerPassword.value,
   };
-  registerUser()
-    .then((res) => {
-      login(user)
-        .then(({ _id, token, expiresIn }) => {
-          _id = _id;
-          setToken(token);
-          setToHeader();
-          displayName();
-        })
-        .catch((err) => console.log(err));
-    })
-    .catch((err) => console.log(err));
+  changeUserState(user, "register");
 });
-async function registerUser() {
-  const user = {
-    email: elements.registerEmail.value,
-    password: elements.registerPassword.value,
-  };
+async function registerUser(user) {
   const headers = new Headers();
   headers.append("Content-Type", "application/json");
 
@@ -116,7 +135,18 @@ async function registerUser() {
   const response = await fetch(request);
   console.log(response);
   if (response.ok) {
-    return response.json();
+    const data = response.json();
+    data
+      .then((res) => {
+        login(user).then(({ _id, token, expiresIn }) => {
+          _id = _id;
+          setToken(token);
+          setToHeader();
+          elements.name.innerHTML = state.user.email;
+        });
+      })
+      .catch((err) => console.log(err));
+    return data;
   } else {
     const { msg, err } = await response.json();
 
@@ -208,11 +238,13 @@ async function insertCollection(value, where) {
   if (where === "category") {
     const category = {
       name: value,
+      user_id: state.user._id,
     };
     elements.categoryItem.innerHTML += generateHtml(value, where);
 
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
+
     const request = new Request(userRoute + "create-category", {
       method: "POST",
       headers,
@@ -221,17 +253,20 @@ async function insertCollection(value, where) {
 
     const response = await fetch(request);
     const data = await response.json();
-    categories.push(data);
-    console.log(state.category);
+    console.log(data)
     return data;
   } else if (where === "bookmark") {
     elements.contentItemContainer.innerHTML += generateHtml(value, where);
-
+    console.log(state.active.innerHTML);
+    const activeCategory = categories.find(
+      (category) => category.name == state.active.innerHTML
+    );
+    console.log(state);
     const bookmark = {
       name: value.name,
       link: value.link,
       user_id: state.user._id,
-      // category_id: state.category._id,
+      category_id: activeCategory.id,
     };
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
@@ -239,12 +274,14 @@ async function insertCollection(value, where) {
     const request = new Request(userRoute + "create-bookmark", {
       method: "POST",
       headers,
-      // body: JSON.stringify(bookmark),
+      body: JSON.stringify(bookmark),
     });
 
     console.log(value);
     const response = await fetch(request);
-    // return response.json();
+    const data = await response.json();
+
+    console.log(data);
   }
 }
 elements.loginLink.addEventListener("click", () => {
@@ -264,7 +301,7 @@ elements.categoryContainerItem.addEventListener("click", (e) => {
   const arr = [...children];
   const active = arr.find((child) => child.classList.contains(activeClass));
   const child = arr.find((child) => e.target == child);
-  state.category.name = child.innerHTML;
+  state.active = child;
   if (e.target !== active && child) {
     active.classList.remove(activeClass);
     e.target.classList.add(activeClass);
